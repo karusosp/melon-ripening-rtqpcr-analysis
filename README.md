@@ -6,10 +6,10 @@ A reproducible pipeline for analyzing gene expression patterns in climacteric an
 
 This repository contains scripts and workflows for processing and analyzing RT-qPCR data from melon fruit at three developmental stages (15 days after anthesis, 30 DAA, and mature fruit). The analysis examines expression of ripening-associated genes (CmACS, CmACO1, CmATH, CmEREBP) across four cultivars with distinct ripening phenotypes:
 
-- **GMP** – Climacteric ripening
-- **Kinaya** – Intermediate ripening behavior  
-- **Melona** – Climacteric ripening
-- **Tacapa Gold** – Non-climacteric ripening
+-   **GMP** – Climacteric ripening
+-   **Kinaya** – Intermediate ripening behavior\
+-   **Melona** – Climacteric ripening
+-   **Tacapa Gold** – Non-climacteric ripening
 
 The pipeline generates fold-change estimates using the **Livak & Schmittgen (2001) ΔΔCq method** and provides statistical comparisons across cultivars and developmental stages.
 
@@ -27,38 +27,38 @@ The analysis pipeline is divided into two main stages:
 
 Combines raw RT-qPCR data from all cultivars into tidy, analysis-ready datasets:
 
-- **Input**: Raw CQ values and RFU (Relative Fluorescence Unit) files from the qPCR instrument
-  - `cq-raw_*.csv` – Cycle threshold (Cq) data  
-  - `rfu-raw_*.csv` – Real-time fluorescence amplification curves (40 cycles × 96 wells)
-
-- **Processing**:
-  - Parses sample codes to extract cultivar, developmental stage (15 DAA, 30 DAA, Mature), and biological replicate
-  - Joins RFU and CQ data on well and target gene
-  - Standardizes well naming (converts well codes to 12-column format: A01–H12)
-  - Flags non-NTC wells with NaN Cq values (amplification failures)
-
-- **Output**: 
-  - `cq_combined.rds` – Combined CQ data (one row per well per target per cultivar)
-  - `rfu_combined.rds` – Combined RFU data annotated with target and sample metadata
+-   **Input**: Raw CQ values and RFU (Relative Fluorescence Unit) files from the qPCR instrument
+    -   `cq-raw_*.csv` – Cycle threshold (Cq) data\
+    -   `rfu-raw_*.csv` – Real-time fluorescence amplification curves (40 cycles × 96 wells)
+-   **Processing**:
+    -   Parses sample codes to extract cultivar, developmental stage (15 DAA, 30 DAA, Mature), and biological replicate
+    -   Joins RFU and CQ data on well and target gene
+    -   Standardizes well naming (converts well codes to 12-column format: A01–H12)
+    -   Flags non-NTC wells with NaN Cq values (amplification failures)
+-   **Output**:
+    -   `cq_combined.rds` – Combined CQ data (one row per well per target per cultivar)
+    -   `rfu_combined.rds` – Combined RFU data annotated with target and sample metadata
 
 ### 2. **Efficiency Estimation** (`efficiency-estimation.R`)
 
 Validates primer pair performance by estimating PCR amplification efficiency:
 
-- **Method**: Linear regression on log₁₀(RFU) per cycle (Ramakers et al. 2003)
+-   **Method**: Linear regression on log₁₀(RFU) per cycle (Ramakers et al. 2003)
 
-- **Algorithm** (per well):
-  1. Log₁₀-transform RFU values
-  2. Slide a window (default 5 cycles) across all PCR cycles
-  3. Fit linear regression: log₁₀(RFU) ~ Cycle for each window
-  4. Filter windows with slope ≥ 0.15 (to exclude plateau/noise regions)
-  5. Select window with highest R² (most linear exponential phase)
-  6. Calculate efficiency: **E = 10^slope**
+-   **Algorithm** (per well):
 
-- **Output**:
-  - `efficiency-per-well.csv` – Per-well efficiency, R², and window boundaries  
-  - `efficiency-per-gene.csv` – Mean efficiency per target gene (across all wells)
-  - `efficiency-per-gene-per-cultivar.csv` – Mean efficiency per gene per cultivar
+    1.  Log₁₀-transform RFU values
+    2.  Slide a window (default 5 cycles) across all PCR cycles
+    3.  Fit linear regression: log₁₀(RFU) \~ Cycle for each window
+    4.  Filter windows with slope ≥ 0.15 (to exclude plateau/noise regions)
+    5.  Select window with highest R² (most linear exponential phase)
+    6.  Calculate efficiency: **E = 10\^slope**
+
+-   **Output**:
+
+    -   `efficiency-per-well.csv` – Per-well efficiency, R², and window boundaries\
+    -   `efficiency-per-gene.csv` – Mean efficiency per target gene (across all wells)
+    -   `efficiency-per-gene-per-cultivar.csv` – Mean efficiency per gene per cultivar
 
 **Note**: Efficiency estimation serves primer validation only. The downstream ΔΔCq analysis does not assume equal efficiencies across samples (does not use the Pfaffl method).
 
@@ -66,17 +66,17 @@ Validates primer pair performance by estimating PCR amplification efficiency:
 
 ### Requirements
 
-- **R** ≥ 4.1  
-- **R packages**:
-  - `tidyverse` (dplyr, tidyr, readr, purrr, ggplot2)
-  - `multcompView` (for Compact Letter Display ANOVA)
-  - `ggpubr` (for creating publication-ready plot/figure)
+-   **R** ≥ 4.1\
+-   **R packages**:
+    -   `tidyverse` (dplyr, tidyr, readr, purrr, ggplot2)
+    -   `multcompView` (for Compact Letter Display ANOVA)
+    -   `ggpubr` (for creating publication-ready plot/figure)
 
 ### Quick Start
 
 Clone the repository and install dependencies:
 
-```bash
+``` bash
 git clone https://github.com/karusosp/melon-ripening-rtqpcr-analysis.git
 cd melon-ripening-rtqpcr-analysis
 
@@ -86,7 +86,7 @@ install.packages(c("tidyverse", "multcompView", "ggpubr"))
 
 ## Directory Structure
 
-```
+```         
 melon-ripening-rtqpcr-analysis/
 ├── README.md
 ├── data/
@@ -127,14 +127,14 @@ melon-ripening-rtqpcr-analysis/
 
 ### Step 1: Prepare Data
 
-```r
+``` r
 source("scripts/data-preparation.R")
 # Generates: data/processed_data/cq_combined.rds, rfu_combined.rds
 ```
 
 ### Step 2: Estimate Primer Efficiency
 
-```r
+``` r
 source("scripts/efficiency-estimation.R")
 # Generates: results/efficiency-per-*.csv files
 # Review flagged primers with efficiency outside 90–110% range (E = 1.9–2.1)
@@ -142,7 +142,7 @@ source("scripts/efficiency-estimation.R")
 
 ### Step 3: Calculate Fold Changes (ΔΔCq)
 
-```r
+``` r
 source("scripts/ddcq-analysis.R")
 # Generates:
 #   - results/ddcq_per_biorep.csv (per-replicate fold-changes)
@@ -152,7 +152,7 @@ source("scripts/ddcq-analysis.R")
 
 ### Step 4: Visualize Results
 
-```r
+``` r
 # Render the Quarto document (in RStudio or CLI):
 # quarto render figures/melon-ripening.qmd
 # Generates publication-ready four-panel figure with statistical annotations
@@ -172,72 +172,55 @@ $$\Delta\Delta\text{Cq} = (\text{Cq}_{\text{target}} - \text{Cq}_{\text{ref}}) -
 
 ### Key Implementation Details
 
-1. **Reference Gene**: CmCYP (constitutive expression, used for normalization)
-2. **Calibrator**: 15 DAA fruit from each biological replicate (baseline = fold change of 1.0)
-3. **Per-Replicate Calibrator Pairing**: The ΔΔCq calibrator is computed for each biological replicate independently, matching each 30 DAA or mature sample to its corresponding 15 DAA replicate—not as a cross-replicate mean.
-4. **Target Genes**: CmACS, CmACO1, CmATH, CmEREBP
-5. **Comparisons**: Fold-changes are calculated relative to 15 DAA within each biological replicate, then averaged across replicates.
+1.  **Reference Gene**: CmCYP (constitutive expression, used for normalization)
+2.  **Calibrator**: 15 DAA fruit from each biological replicate (baseline = fold change of 1.0)
+3.  **Per-Replicate Calibrator Pairing**: The ΔΔCq calibrator is computed for each biological replicate independently, matching each 30 DAA or mature sample to its corresponding 15 DAA replicate—not as a cross-replicate mean.
+4.  **Target Genes**: CmACS, CmACO1, CmATH, CmEREBP
+5.  **Comparisons**: Fold-changes are calculated relative to 15 DAA within each biological replicate, then averaged across replicates.
 
 ### Output Interpretation
 
-- `ddcq_per_biorep.csv`: Raw fold-change for each target gene, cultivar, developmental stage, and biological replicate
-- `ddcq_summary.csv`: Mean fold-change ± SEM (standard error of the mean) summarized by cultivar and stage
-- `tukey_anova.csv`: Pairwise post-hoc comparisons (Tukey HSD) with p-values and significance annotations
+-   `ddcq_per_biorep.csv`: Raw fold-change for each target gene, cultivar, developmental stage, and biological replicate
+-   `ddcq_summary.csv`: Mean fold-change ± SEM (standard error of the mean) summarized by cultivar and stage
+-   `tukey_anova.csv`: Pairwise post-hoc comparisons (Tukey HSD) with p-values and significance annotations
 
 ### Important Notes on Fold-Change Magnitude
 
-Large fold-changes (e.g., Melona CmACS: >100-fold) can reflect very low baseline (15 DAA) expression rather than extremely high absolute induction. Always interpret fold-changes in context:
-- Check the raw Cq values to assess baseline expression level
-- Large fold-changes with high baseline Cq (low expression) should be interpreted cautiously
-- Consistency of expression patterns across biological replicates is more informative than any single extreme value
+Large fold-changes (e.g., Melona CmACS: \>100-fold) can reflect very low baseline (15 DAA) expression rather than extremely high absolute induction. Always interpret fold-changes in context: - Check the raw Cq values to assess baseline expression level - Large fold-changes with high baseline Cq (low expression) should be interpreted cautiously - Consistency of expression patterns across biological replicates is more informative than any single extreme value
 
 ## Files Description
 
 ### Input Data
 
-- **cq-raw_*.csv**: Cycle threshold (quantification cycle) values exported directly from the qPCR instrument. Includes well position, target gene, sample identifier, Cq value, and set point (fluorescence threshold). NTC (No Template Control) wells are included for quality assessment.
+-   \*\*cq-raw\_\*.csv\*\*: Cycle threshold (quantification cycle) values exported directly from the qPCR instrument. Includes well position, target gene, sample identifier, Cq value, and set point (fluorescence threshold). NTC (No Template Control) wells are included for quality assessment.
 
-- **rfu-raw_*.csv**: Real-time fluorescence intensity (RFU) for each PCR cycle (rows) and well (columns). Used for efficiency estimation and quality control.
+-   \*\*rfu-raw\_\*.csv\*\*: Real-time fluorescence intensity (RFU) for each PCR cycle (rows) and well (columns). Used for efficiency estimation and quality control.
 
 ### Processed Data
 
-- **cq_combined.rds**: Merged and annotated CQ data from all cultivars. Includes parsed sample metadata (developmental stage, biological replicate).
+-   **cq_combined.rds**: Merged and annotated CQ data from all cultivars. Includes parsed sample metadata (developmental stage, biological replicate).
 
-- **rfu_combined.rds**: Merged and annotated RFU data. Linked to CQ metadata for integrated analysis.
+-   **rfu_combined.rds**: Merged and annotated RFU data. Linked to CQ metadata for integrated analysis.
 
 ### Output Files
 
-- **efficiency-per-gene.csv**: Mean PCR efficiency per target gene across all cultivars and wells. Used to flag problematic primers.
+-   **efficiency-per-gene.csv**: Mean PCR efficiency per target gene across all cultivars and wells. Used to flag problematic primers.
 
-- **efficiency-per-gene-per-cultivar.csv**: PCR efficiency stratified by cultivar, for detecting cultivar-specific primer performance issues.
+-   **efficiency-per-gene-per-cultivar.csv**: PCR efficiency stratified by cultivar, for detecting cultivar-specific primer performance issues.
 
-- **ddcq_per_biorep.csv**: Fold-change estimates for each target gene, cultivar, developmental stage, and biological replicate. Primary quantitative output.
+-   **ddcq_per_biorep.csv**: Fold-change estimates for each target gene, cultivar, developmental stage, and biological replicate. Primary quantitative output.
 
-- **ddcq_summary.csv**: Mean and SEM of fold-change grouped by cultivar and developmental stage. Used for figure generation.
+-   **ddcq_summary.csv**: Mean and SEM of fold-change grouped by cultivar and developmental stage. Used for figure generation.
 
-- **tukey_anova.csv**: ANOVA F-test and pairwise Tukey HSD comparisons. Shows which cultivar × stage combinations differ significantly in gene expression.
-
-## Key Findings Summary
-
-The analysis reveals distinct gene expression signatures associated with climacteric and non-climacteric ripening phenotypes:
-
-- **CmACS** (ethylene biosynthesis) exhibits pronounced up-regulation during climacteric ripening (GMP, Melona) but minimal change in non-climacteric cultivars, consistent with ethylene-dependent ripening regulation.
-
-- **CmACO1** (ethylene biosynthesis) shows variable expression patterns, with elevated levels in mature fruit across most cultivars.
-
-- **CmATH** (ripening-related transcription factor) displays cultivar-specific temporal dynamics.
-
-- **CmEREBP** (ethylene-responsive element binding protein) shows ripening-stage dependent expression.
-
-Melona and GMP display predominantly climacteric characteristics, Tacapa Gold exhibits non-climacteric behavior, and Kinaya shows an intermediate profile, aligning with morphological and physiological observations.
+-   **tukey_anova.csv**: ANOVA F-test and pairwise Tukey HSD comparisons. Shows which cultivar × stage combinations differ significantly in gene expression.
 
 ## References
 
-- Livak KJ, Schmittgen TD. (2001). Analysis of Relative Gene Expression Data Using Real-Time Quantitative PCR and the 2-ΔΔCT Method. *Methods* 25:402–8. https://doi.org/10.1006/meth.2001.1262
+-   Livak KJ, Schmittgen TD. (2001). Analysis of Relative Gene Expression Data Using Real-Time Quantitative PCR and the 2-ΔΔCT Method. *Methods* 25:402–8. <https://doi.org/10.1006/meth.2001.1262>
 
-- Ramakers C, Ruijter JM, Deprez RHL, Moorman AFM. (2003). Assumption-free analysis of quantitative real-time polymerase chain reaction (PCR) data. *Neuroscience Letters* 339:62–66. https://doi.org/10.1016/S0304-3940(02)01423-4
+-   Ramakers C, Ruijter JM, Deprez RHL, Moorman AFM. (2003). Assumption-free analysis of quantitative real-time polymerase chain reaction (PCR) data. *Neuroscience Letters* 339:62–66. [https://doi.org/10.1016/S0304-3940(02)01423-4](https://doi.org/10.1016/S0304-3940(02)01423-4){.uri}
 
-- Ruijter JM, Ramakers C, Hoogaars WM, et al. (2009). Amplification efficiency: linking baseline and bias in the analysis of quantitative PCR data. *Nucleic Acids Research* 37:e45. https://doi.org/10.1093/nar/gmp059
+-   Ruijter JM, Ramakers C, Hoogaars WM, et al. (2009). Amplification efficiency: linking baseline and bias in the analysis of quantitative PCR data. *Nucleic Acids Research* 37:e45. <https://doi.org/10.1093/nar/gmp059>
 
 ## Contributing
 
@@ -247,4 +230,4 @@ Contributions are welcome. Please open an issue or submit a pull request for bug
 
 For questions or feedback about this analysis, please contact the project maintainers or open an issue on GitHub.
 
-**Last Updated**: April 2026  
+**Last Updated**: April 2026
