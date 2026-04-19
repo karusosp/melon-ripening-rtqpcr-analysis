@@ -1,0 +1,282 @@
+---
+title: "Supplementary Data: RT-qPCR Gene Expression and Fruit Morphometrics Data Analysis"
+subtitle: "Ripening-Associated Gene Expression in Climacteric and Non-Climacteric Melon Cultivars"
+author: ""
+date: today
+format:
+  pdf:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    fig-pos: "H"
+    keep-tex: false
+    geometry: margin=2.5cm
+    fontsize: 11pt
+execute:
+  echo: false
+  warning: false
+  message: false
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+{{< pagebreak >}}
+
+# Overview
+
+This document provides full reproducibility documentation for the
+RT-qPCR gene expression and fruit morphological data analysis
+accompanying the manuscript. All raw data, scripts, and intermediate
+outputs are available in the project repository.
+
+The RT-qPCR analysis quantifies the relative expression of four
+ripening-associated genes — *CmACS*, *CmACO1*, *CmATH*, and *CmEREBP* —
+across three developmental stages (15 DAA, 30 DAA, and maturity) in four
+melon (*Cucumis melo*) cultivars (GMP, Kinaya, Melona, Tacapa Gold).
+Expression is normalized to the reference gene *CmCYP* using the ΔΔCq
+method (Livak & Schmittgen, 2001). The fruit morphology data are
+gathered to provide supporting data in regard of melon fruit ripening
+pattern.
+
+## Software and Package Versions
+
+```{r}
+#| label: session-info
+R.version.string
+packageVersion("tidyverse")
+packageVersion("multcompView")
+packageVersion("patchwork")
+```
+
+------------------------------------------------------------------------
+
+# RT-qPCR Data Processing
+
+## Data Preparation
+
+Raw Cq values and RFU amplification curves are loaded from `data/1-cq/`
+and `data/2-rfu/` respectively, combined across all four cultivars, and
+saved as analysis-ready `.csv` files.
+
+The sample identifier follows the format
+`[CultivarPrefix].[Stage].[BiologicalReplicate]` (e.g., `G.15.A` = GMP
+cultivar, 15 DAA, biological replicate A). NTC (no-template control)
+wells are retained through this step for downstream quality checking.
+
+```{r}
+#| label: data-preparation
+source("scripts/01-data_preparation.R")
+```
+
+```{r}
+#| label: cq-summary
+#| tbl-cap: "Overview of combined Cq dataset (first 10 rows)"
+head(cq_combined, 10) |> knitr::kable()
+```
+
+------------------------------------------------------------------------
+
+## Primer Efficiency Estimation
+
+Amplification efficiency is estimated per well from the raw RFU
+amplification curves following Ramakers et al. (2003). The algorithm
+fits a linear regression on log~10~-transformed RFU values across a
+sliding window of 5 consecutive cycles. The window with the highest R²
+among those with slope ≥ 0.15 is selected as the exponential phase, and
+efficiency is computed as E = 10^slope^.
+
+This approach is appropriate for validating primer pairs in a 2^−ΔΔCq^
+study; the goal is confirming that all primers amplify within the
+acceptable 90–110% efficiency range (E = 1.90–2.10).
+
+```{r}
+#| label: efficiency-estimation
+source("scripts/02-efficiency_estimation.R")
+```
+
+### Per-Gene Efficiency Summary
+
+```{r}
+#| label: tbl-efficiency-gene
+#| tbl-cap: "Mean primer amplification efficiency per target gene across all cultivars and wells. Efficiency flag: OK = 90–110%, Acceptable = 80–90% or 110–120%."
+efficiency_per_gene |>
+  dplyr::select(target, n_wells, mean_efficiency, sd_efficiency, 
+                efficiency_pct, mean_r2, efficiency_flag) |>
+  knitr::kable(digits = 3, col.names = c(
+    "Gene", "N Wells", "Mean E", "SD E", "Efficiency (%)", "Mean R²", "Flag"
+  ))
+```
+
+### Per-Gene Per-Cultivar Efficiency
+
+```{r}
+#| label: tbl-efficiency-cultivar
+#| tbl-cap: "Mean primer amplification efficiency per gene per cultivar."
+efficiency_per_gene_per_cultivar |>
+  dplyr::select(cultivar, target, n_wells, mean_efficiency, 
+                sd_efficiency, efficiency_pct, efficiency_flag) |>
+  knitr::kable(digits = 3, col.names = c(
+    "Cultivar", "Gene", "N Wells", "Mean E", "SD E", "Efficiency (%)", "Flag"
+  ))
+```
+
+------------------------------------------------------------------------
+
+## Fold-Change Calculation (ΔΔCq)
+
+Relative expression is calculated using the 2^−ΔΔCq^ method (Livak &
+Schmittgen, 2001):
+
+1.  Technical replicates (two wells per biological replicate) are
+    averaged to yield one mean Cq per gene × biological replicate.
+2.  ΔCq = Cq(GOI) − Cq(*CmCYP*), computed per biological replicate.
+3.  The calibrator ΔCq is the paired 15 DAA ΔCq value for the same
+    cultivar and biological replicate (matched on `cultivar + bio_rep`).
+4.  ΔΔCq = ΔCq(sample) − ΔCq(calibrator).
+5.  Fold-change = 2^−ΔΔCq^.
+
+```{r}
+#| label: fold-change
+source("scripts/03-fold_change.R")
+```
+
+### Per-Replicate Fold-Change (First 12 Rows)
+
+```{r}
+#| label: tbl-fc-biorep
+#| tbl-cap: "Fold-change per biological replicate (2^−ΔΔCq). Values are relative to 15 DAA within each cultivar."
+head(results_long, 12) |>
+  knitr::kable(digits = 3)
+```
+
+### Summary: Mean ± SE Fold-Change
+
+```{r}
+#| label: tbl-fc-summary
+#| tbl-cap: "Mean fold-change (±SE) per cultivar × developmental stage × gene. n = 3 biological replicates."
+results_summary |>
+  dplyr::select(cultivar, gene, stage, n_bio_reps, mean_fc, se_fc) |>
+  knitr::kable(digits = 3, col.names = c(
+    "Cultivar", "Gene", "Stage", "n", "Mean FC", "SE"
+  ))
+```
+
+------------------------------------------------------------------------
+
+## Statistical Testing
+
+One-way ANOVA followed by Tukey HSD post-hoc pairwise comparisons is
+applied per cultivar × gene combination to test for significant
+differences in expression across developmental stages. Fold-change
+values are log~2~-transformed prior to ANOVA to stabilize variance.
+Compact letter display (CLD) notation is derived from the Tukey p-values
+using `multcompView`.
+
+```{r}
+#| label: statistical-test
+source("scripts/04-statistical_test.R")
+```
+
+```{r}
+#| label: tbl-ddcq-tukey
+#| tbl-cap: "Tukey HSD pairwise comparisons between developmental stages, per cultivar and gene. Significance: *** p < 0.001, ** p < 0.01, * p < 0.05, ns = not significant."
+tukey_results |>
+  dplyr::select(cultivar, gene, comparison, estimate, conf.low, conf.high, 
+                adj.p.value, sig) |>
+  knitr::kable(digits = 4, col.names = c(
+    "Cultivar", "Gene", "Comparison", "Estimate", "95% CI Low", 
+    "95% CI High", "Adj. p-value", "Sig."
+  ))
+```
+
+------------------------------------------------------------------------
+
+## Expression Figure
+
+The final figure shows mean log~2~ fold-change per cultivar and
+developmental stage for each gene, presented as grouped bar charts with
+SEM error bars and CLD annotations. Stage labels (15, 30, M) are
+displayed below each group of bars.
+
+```{r}
+#| label: fig-expression
+#| fig-cap: "Relative expression (log2 fold-change relative to 15 DAA) of four ripening-associated genes across three developmental stages in four melon cultivars. Error bars represent SEM (n = 3). Letters above bars indicate statistically homogeneous groups based on Tukey HSD (p < 0.05)."
+#| fig-width: 7
+#| fig-height: 5.5
+source("scripts/05-expression_plot.R")
+log2_fc_plot
+```
+
+# Fruit Morphology Data Analysis
+
+The recorded fruit morphology data include fruit weight, perimeter,
+diameter, as well as quality-related trait such as flesh firmness and
+soluble solid content. All the quantitative data are compared across
+developmental stage to see the general pattern of melon fruit ripening
+process. Comparison is done through ANOVA and Tukey's Post Hoc
+statistical test under the assumption that the data are normally
+distributed. The result will be presented as summary statistics table as
+well as line plot for quality-related fruit morphology data (soluble
+solid content and flesh firmness).
+
+```{r}
+#| message: false
+#| warning: false
+#| include: false
+source("scripts/06-morphometrics_analysis.R")
+```
+
+## Summary Statistics Table
+
+```{r}
+#| label: morpho-summary1
+#| tbl-cap: "Summary statistics of fruit morphology data. Description: fw = fruitweight, vc (vertical perimeter, hc (horizontal perimeter), vd (vertical diameter), hd (horizontal diameter), rd (rind_thickness), ft (flesh thickness), firm (flesh firmness)"
+
+library(kableExtra)
+summary_tbl |> 
+  select(cultivar, stage, fw, hc, vd, hd) |> 
+  kable() |> 
+  kable_styling(font_size = 9)
+```
+
+```{r}
+#| label: morpho-summary2
+#| tbl-cap: "(Cont't) Summary statistics of fruit morphology data. Description: fw = fruitweight, vc (vertical perimeter, hc (horizontal perimeter), vd (vertical diameter), hd (horizontal diameter), rd (rind_thickness), ft (flesh thickness), firm (flesh firmness), ssc (soluble solid content"
+
+library(kableExtra)
+summary_tbl |> 
+  select(cultivar, stage, rd, ft, firm, ssc) |> 
+  kable() |> 
+  kable_styling(font_size = 9)
+```
+
+## Statistical Test
+
+```{r}
+#| label: morpho-ANOVA
+#| tbl-cap: "ANOVA statistics of fruit morphology data."
+morpho_anova |> 
+  select(traits, cultivar, comparison, `p adj`) |> 
+  knitr::kable(digit = 6)
+```
+
+## Fruit Quality Plot
+
+```{r}
+morpho_plot
+```
+
+------------------------------------------------------------------------
+
+# References
+
+-   Livak KJ, Schmittgen TD (2001). Analysis of relative gene expression
+    data using real-time quantitative PCR and the 2^−ΔΔCT^ method.
+    *Methods* 25:402–8.
+    doi:[10.1006/meth.2001.1262](https://doi.org/10.1006/meth.2001.1262)
+
+-   Ramakers C, Ruijter JM, Deprez RH, Moorman AF (2003).
+    Assumption-free analysis of quantitative real-time polymerase chain
+    reaction (PCR) data. *Neuroscience Letters* 339:62–66.
+    doi:[10.1016/S0304-3940(02)01423-4](https://doi.org/10.1016/S0304-3940(02)01423-4)
