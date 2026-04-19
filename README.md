@@ -81,7 +81,7 @@ git clone https://github.com/karusosp/melon-ripening-rtqpcr-analysis.git
 cd melon-ripening-rtqpcr-analysis
 
 # In R:
-install.packages(c("tidyverse", "agricolae"))
+install.packages(c("tidyverse", "multcompView", "ggpubr"))
 ```
 
 ## Directory Structure
