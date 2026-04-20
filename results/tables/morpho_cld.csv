@@ -1,0 +1,97 @@
+traits,cultivar,stage,cld_letters
+firmness,Melona,30 DAA,a
+firmness,Melona,Mature,ab
+firmness,Melona,15 DAA,b
+firmness,GMP,30 DAA,ab
+firmness,GMP,Mature,a
+firmness,GMP,15 DAA,b
+firmness,Tacapa,30 DAA,ab
+firmness,Tacapa,Mature,a
+firmness,Tacapa,15 DAA,b
+firmness,Kinaya,30 DAA,a
+firmness,Kinaya,Mature,b
+firmness,Kinaya,15 DAA,c
+flesh_thickness,Melona,30 DAA,a
+flesh_thickness,Melona,Mature,a
+flesh_thickness,Melona,15 DAA,b
+flesh_thickness,GMP,30 DAA,a
+flesh_thickness,GMP,Mature,b
+flesh_thickness,GMP,15 DAA,a
+flesh_thickness,Tacapa,30 DAA,a
+flesh_thickness,Tacapa,Mature,a
+flesh_thickness,Tacapa,15 DAA,b
+flesh_thickness,Kinaya,30 DAA,a
+flesh_thickness,Kinaya,Mature,a
+flesh_thickness,Kinaya,15 DAA,b
+fruit_weight,Melona,30 DAA,a
+fruit_weight,Melona,Mature,a
+fruit_weight,Melona,15 DAA,b
+fruit_weight,GMP,30 DAA,a
+fruit_weight,GMP,Mature,a
+fruit_weight,GMP,15 DAA,a
+fruit_weight,Tacapa,30 DAA,a
+fruit_weight,Tacapa,Mature,b
+fruit_weight,Tacapa,15 DAA,a
+fruit_weight,Kinaya,30 DAA,a
+fruit_weight,Kinaya,Mature,a
+fruit_weight,Kinaya,15 DAA,b
+h_diameter,Melona,30 DAA,a
+h_diameter,Melona,Mature,a
+h_diameter,Melona,15 DAA,b
+h_diameter,GMP,30 DAA,a
+h_diameter,GMP,Mature,a
+h_diameter,GMP,15 DAA,a
+h_diameter,Tacapa,30 DAA,a
+h_diameter,Tacapa,Mature,b
+h_diameter,Tacapa,15 DAA,a
+h_diameter,Kinaya,30 DAA,a
+h_diameter,Kinaya,Mature,a
+h_diameter,Kinaya,15 DAA,b
+h_perimeter,Melona,30 DAA,a
+h_perimeter,Melona,Mature,b
+h_perimeter,Melona,15 DAA,c
+h_perimeter,GMP,30 DAA,a
+h_perimeter,GMP,Mature,a
+h_perimeter,GMP,15 DAA,a
+h_perimeter,Tacapa,30 DAA,a
+h_perimeter,Tacapa,Mature,b
+h_perimeter,Tacapa,15 DAA,a
+h_perimeter,Kinaya,30 DAA,a
+h_perimeter,Kinaya,Mature,a
+h_perimeter,Kinaya,15 DAA,b
+ssc,Melona,30 DAA,a
+ssc,Melona,Mature,b
+ssc,Melona,15 DAA,a
+ssc,GMP,30 DAA,a
+ssc,GMP,Mature,b
+ssc,GMP,15 DAA,c
+ssc,Tacapa,30 DAA,a
+ssc,Tacapa,Mature,b
+ssc,Tacapa,15 DAA,a
+ssc,Kinaya,30 DAA,a
+ssc,Kinaya,Mature,a
+ssc,Kinaya,15 DAA,b
+v_diameter,Melona,30 DAA,a
+v_diameter,Melona,Mature,a
+v_diameter,Melona,15 DAA,b
+v_diameter,GMP,30 DAA,a
+v_diameter,GMP,Mature,a
+v_diameter,GMP,15 DAA,a
+v_diameter,Tacapa,30 DAA,a
+v_diameter,Tacapa,Mature,b
+v_diameter,Tacapa,15 DAA,a
+v_diameter,Kinaya,30 DAA,a
+v_diameter,Kinaya,Mature,a
+v_diameter,Kinaya,15 DAA,a
+v_perimeter,Melona,30 DAA,a
+v_perimeter,Melona,Mature,b
+v_perimeter,Melona,15 DAA,c
+v_perimeter,GMP,30 DAA,a
+v_perimeter,GMP,Mature,a
+v_perimeter,GMP,15 DAA,a
+v_perimeter,Tacapa,30 DAA,a
+v_perimeter,Tacapa,Mature,b
+v_perimeter,Tacapa,15 DAA,a
+v_perimeter,Kinaya,30 DAA,a
+v_perimeter,Kinaya,Mature,a
+v_perimeter,Kinaya,15 DAA,b

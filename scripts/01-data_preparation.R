@@ -130,9 +130,9 @@ morpho_df <- read_csv("data/morphometrics/fruit_morphometrics.csv",
 dir.create("data/processed_data", recursive = TRUE, showWarnings = FALSE)
 
 # Preparing the directory for analysis results
-dir.create("results/")
-dir.create("results/tables/") 
-dir.create("results/figures/")
+dir.create("results/", showWarnings = FALSE)
+dir.create("results/tables/", showWarnings = FALSE) 
+dir.create("results/figures/", showWarnings = FALSE)
 
 # write all the combined data
 write_csv(cq_combined,  "data/processed_data/cq_combined.csv")

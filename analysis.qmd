@@ -31,7 +31,7 @@ accompanying the manuscript. All raw data, scripts, and intermediate
 outputs are available in the project repository.
 
 The RT-qPCR analysis quantifies the relative expression of four
-ripening-associated genes — *CmACS*, *CmACO1*, *CmATH*, and *CmEREBP* —
+ripening-associated genes — *CmACS*, *CmACO*, *CmATH*, and *CmEREBP* —
 across three developmental stages (15 DAA, 30 DAA, and maturity) in four
 melon (*Cucumis melo*) cultivars (GMP, Kinaya, Melona, Tacapa Gold).
 Expression is normalized to the reference gene *CmCYP* using the ΔΔCq
