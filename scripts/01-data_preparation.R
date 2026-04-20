@@ -60,7 +60,7 @@ cq_combined <- list.files("data/cq/", full.names = TRUE) |>
     cultivar  = factor(cultivar),
     target    = factor(target),
     content   = factor(content),
-    stage = factor(stage, levels = c("M", "15", "30")),
+    stage     = factor(stage, levels = c("M", "15", "30")),
     bio_rep   = factor(bio_rep,   levels = c("A", "B", "C"))
   ) |>
   select(cultivar, well, target, content, sample,
@@ -125,12 +125,16 @@ morpho_df <- read_csv("data/morphometrics/fruit_morphometrics.csv",
   relocate(cultivar)
   
 
-#-- Step 4. Saving -The Data -----------------------------------------------------------
+#-- Step 4. Saving The Data -----------------------------------------------------------
 
 dir.create("data/processed_data", recursive = TRUE, showWarnings = FALSE)
-# Write the combined data as .rds file so that it retain R-related metadata 
-# for further analysis
+
+# Preparing the directory for analysis results
+dir.create("results/")
+dir.create("results/tables/") 
+dir.create("results/figures/")
+
+# write all the combined data
 write_csv(cq_combined,  "data/processed_data/cq_combined.csv")
 write_csv(rfu_combined,  "data/processed_data/rfu_combined.csv")
 write_csv(morpho_df, "data/processed_data/morphometrics.csv")
-message("All the resulting dataset are stored in `data/processed_data/` directory")

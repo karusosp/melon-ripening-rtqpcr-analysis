@@ -53,7 +53,7 @@ plot_df <- tidy_fc |>
 log2_fc_plot <- plot_df |>
   mutate(
     cultivar = factor(cultivar, levels = c("Melona", "GMP", "Tacapa", "Kinaya")),
-    gene  = factor(gene, levels = c("CmACS", "CmACO1", "CmATH", "CmEREBP")
+    gene  = factor(gene, levels = c("CmACS", "CmACO", "CmATH", "CmEREBP")
     )
   ) |> 
   ggplot(aes(
@@ -111,6 +111,7 @@ log2_fc_plot <- plot_df |>
   xlab("") -> log2_fc_plot
 
 # -- Saving The Plot ----------------------------------------------------------
+dir.create("results/figures/", recursive = TRUE, showWarnings = FALSE)
 ggsave(
   plot = log2_fc_plot,
   filename = "results/figures/log2_fold-change.png",

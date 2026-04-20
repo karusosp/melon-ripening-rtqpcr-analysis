@@ -166,9 +166,6 @@ efficiency_per_gene_per_cultivar <- efficiency_per_well |>
 
 
 # ── Save ──────────────────────────────────────────────────────────────────────
-
-dir.create("results", showWarnings = FALSE)
-
 write_csv(efficiency_per_well,              "results/tables/efficiency-per-well.csv")
 write_csv(efficiency_per_gene,              "results/tables/efficiency-per-gene.csv")
 write_csv(efficiency_per_gene_per_cultivar, "results/tables/efficiency-per-gene-per-cultivar.csv")

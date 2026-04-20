@@ -40,4 +40,3 @@ tukey_results <- read_csv("results/tables/ddcq_per_biorep.csv") |>
 
 # -- Step 2. Saving Results
 write_csv(tukey_results,   "results/tables/tukey_anova.csv")
-message("  results/tables/tukey_anova.csv       — Tukey HSD pairwise stage comparisons")

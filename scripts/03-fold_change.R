@@ -30,11 +30,11 @@ suppressPackageStartupMessages({
   library(stringr)
 })
 
-# ── Parameters ────────────────────────────────────────────────────────────────
+# -- Parameters ---------------------------------------------------------------
 
 REFERENCE_GENE <- "CmCYP"
 CALIBRATOR     <- "15"   # stage used as reference (15 DAA)
-GOI            <- c("CmACS", "CmACO1", "CmATH", "CmEREBP")
+GOI            <- c("CmACS", "CmACO", "CmATH", "CmEREBP")
 
 # Cultivar prefix → full name mapping
 CULTIVAR_MAP <- c(
@@ -44,7 +44,7 @@ CULTIVAR_MAP <- c(
   T = "Tacapa"
 )
 
-# ── 1. Load and combine raw Cq files ─────────────────────────────────────────
+# -- Step 1. Load and combine raw Cq files ------------------------------------
 
 read_cq_raw <- function(path) {
   cultivar_code <- basename(path) |>
@@ -86,7 +86,7 @@ message(sprintf("  Loaded %d Cq measurements across %d cultivars",
                 nrow(cq_all), n_distinct(cq_all$cultivar)))
 
 
-# ── 2. Average technical replicates ──────────────────────────────────────────
+# -- Step 2. Average technical replicates -------------------------------------
 # Each bio-rep × gene combination may appear in two wells (technical replicates).
 # We average them here before any ΔCq calculation.
 
@@ -99,7 +99,7 @@ cq_mean <- cq_all |>
   )
 
 
-# ── 3. Pivot to wide and compute ΔCq ─────────────────────────────────────────
+# -- Step 3. Pivot to wide and compute ΔCq ------------------------------------
 # Wide format: one row per cultivar × stage × bio_rep,
 # columns = one mean_Cq per gene
 
@@ -121,7 +121,7 @@ delta_cq <- cq_wide |>
   select(cultivar, stage, bio_rep, starts_with("dCq_"))
 
 
-# ── 4. Extract calibrator ΔCq per cultivar × bio_rep × gene ─────────────────
+# -- Step 4. Extract calibrator ΔCq per cultivar × bio_rep × gene -------------
  
 calibrator_dCq <- delta_cq |>
   filter(stage == CALIBRATOR) |>
@@ -133,7 +133,7 @@ delta_cq <- delta_cq |>
   left_join(calibrator_dCq, by = c("cultivar", "bio_rep"))
   
 
-# ── 5. ΔΔCq and fold-change (2^−ΔΔCq) per bio-rep ───────────────────────────
+# -- Step 5. ΔΔCq and fold-change (2^−ΔΔCq) per bio-rep -----------------------
 
 # Build ΔΔCq columns dynamically for each GOI
 for (gene in GOI) {
@@ -154,7 +154,7 @@ results_per_biorep <- delta_cq |>
          starts_with("fc_"))
 
 
-# ── 6. Summary table: mean ± SE per cultivar × stage × gene ──────────────────
+# -- Step 6. Summary table: mean ± SE per cultivar × stage × gene -------------
 
 fc_cols <- paste0("fc_", GOI)
 
@@ -196,7 +196,7 @@ results_long <- results_per_biorep |>
   ) |>
   arrange(cultivar, gene, stage, bio_rep)
 
-dir.create("results", showWarnings = FALSE)
+# -- Step 7. Saving the Fold Change Results -----------------------------------
 write_csv(results_long,    "results/tables/ddcq_per_biorep.csv")
 write_csv(results_summary, "results/tables/ddcq_summary.csv")
 
